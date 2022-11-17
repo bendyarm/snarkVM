@@ -26,6 +26,12 @@ edition = "2021"
 [features]
 save_r1cs_hashes = [ "snarkvm-circuit-environment/save_r1cs_hashes" ]
 
+[dependencies.serde_json]
+version = "1.0"
+
+[dependencies.serde]
+version = "1.0"
+
 [dependencies.snarkvm-circuit-account]
 path = "./account"
 version = "=3.7.1"

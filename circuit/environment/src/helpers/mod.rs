@@ -30,6 +30,9 @@ pub use count::*;
 pub(super) mod counter;
 pub(super) use counter::*;
 
+pub mod json;
+pub use json::*;
+
 pub mod linear_combination;
 pub use linear_combination::*;
 

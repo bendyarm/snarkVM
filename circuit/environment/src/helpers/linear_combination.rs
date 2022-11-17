@@ -20,6 +20,7 @@ use core::{
     fmt,
     ops::{Add, AddAssign, Mul, Neg, Sub},
 };
+use indexmap::{map::Entry, IndexMap};
 use smallvec::SmallVec;
 
 // Before high level program operations are converted into constraints, they are first tracked as linear combinations.
