@@ -2706,6 +2706,7 @@ dependencies = [
  "snarkvm-circuit-network",
  "snarkvm-circuit-program",
  "snarkvm-circuit-types",
+ "snarkvm-console-types-field",
 ]
 
 [[package]]

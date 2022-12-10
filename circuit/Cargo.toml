@@ -26,6 +26,10 @@ edition = "2021"
 [features]
 save_r1cs_hashes = [ "snarkvm-circuit-environment/save_r1cs_hashes" ]
 
+[dependencies.snarkvm-console-types-field]
+path = "../console/types/field"
+version = "0.9.10"
+
 [dependencies.serde_json]
 version = "1.0"
 
