@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Assignment, Inject, LinearCombination, Mode, R1CS, Variable, witness_mode};
+use crate::{Assignment, CircuitJSON, Inject, LinearCombination, Mode, R1CS, Variable, witness_mode};
 use snarkvm_curves::AffineCurve;
 use snarkvm_fields::traits::*;
 
@@ -188,4 +188,7 @@ pub trait Environment: 'static + Copy + Clone + fmt::Debug + fmt::Display + Eq +
 
     /// Clears and initializes an empty environment.
     fn reset();
+
+    /// Returns the JSON representation of the constraint system.
+    fn json() -> CircuitJSON;
 }
