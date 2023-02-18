@@ -405,6 +405,20 @@ impl Circuit {
     }
 }
 
+impl Transcribe for Circuit {
+    type Event = ();
+    type Transcript = ();
+
+    /// Clears and returns the accumulated transcript.
+    fn clear() -> Self::Transcript { () }
+}
+
+impl fmt::Display for Circuit {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        CIRCUIT.with(|circuit| write!(f, "{}", (**circuit).borrow()))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use snarkvm_circuit::prelude::*;
