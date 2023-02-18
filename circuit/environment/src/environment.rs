@@ -190,7 +190,4 @@ pub trait Environment:
 
     /// Clears and initializes an empty environment.
     fn reset();
-
-    /// Returns the JSON representation of the constraint system.
-    fn json() -> CircuitJSON;
 }
