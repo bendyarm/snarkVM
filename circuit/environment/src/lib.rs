@@ -42,6 +42,10 @@ pub use testnet_circuit::*;
 pub mod traits;
 pub use traits::*;
 
+// TODO: Feature guard under `formal`.
+pub mod transcribe;
+pub use transcribe::*;
+
 pub mod prelude {
     pub use crate::{
         CircuitType,
