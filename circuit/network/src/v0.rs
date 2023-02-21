@@ -40,6 +40,7 @@ use snarkvm_circuit_algorithms::{
 };
 use snarkvm_circuit_collections::merkle_tree::MerklePath;
 use snarkvm_circuit_types::{
+    environment::{prelude::*, Assignment, Circuit, Transcribe, R1CS},
     Boolean,
     Field,
     Group,

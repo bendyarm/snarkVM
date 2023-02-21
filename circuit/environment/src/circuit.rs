@@ -406,7 +406,6 @@ impl Circuit {
 }
 
 impl Transcribe for Circuit {
-    type Event = ();
     type Transcript = ();
 
     /// Clears and returns the accumulated transcript.
