@@ -16,6 +16,9 @@
 #![forbid(unsafe_code)]
 #![allow(clippy::too_many_arguments)]
 
+pub mod formal;
+pub use formal::*;
+
 pub mod canary_v0;
 pub use canary_v0::*;
 
