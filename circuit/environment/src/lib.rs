@@ -26,7 +26,6 @@ pub use canary_circuit::*;
 pub mod circuit;
 pub use circuit::*;
 
-// TODO: Feature guard under `formal`.
 pub mod formal;
 pub use formal::*;
 

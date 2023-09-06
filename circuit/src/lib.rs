@@ -34,6 +34,7 @@ pub mod modules {
         Circuit,
         Eject,
         Environment,
+        FormalCircuit,
         Inject,
         Mode,
         TestnetCircuit,
