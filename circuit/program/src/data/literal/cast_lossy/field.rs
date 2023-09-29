@@ -120,9 +120,13 @@ mod tests {
         network::MainnetV0,
         prelude::{One, TestRng, Uniform, Zero},
     };
-    use snarkvm_circuit_types::environment::{Circuit, Eject, Inject, Mode, UpdatableCount, count_is, count_less_than};
+    use snarkvm_circuit_types::environment::{Circuit, Eject, FormalCircuit, Inject, Mode, Transcribe, UpdatableCount, count_is, count_less_than};
+    use snarkvm_console_types_field::{Field as ConsoleField, One as ConsoleFieldOne, Zero as ConsoleFieldZero};
+    use snarkvm_console_types_group::Group as ConsoleGroup;
 
-    use std::fmt::Debug;
+    use std::{fmt::Debug,
+              str::FromStr,
+    };
 
     const ITERATIONS: usize = 100;
 
@@ -303,4 +307,49 @@ mod tests {
             count_is!(0, 0, 505, 507),
         );
     }
+
+    #[test]
+    fn formal_sample_field_0_cast_lossy_to_group() {
+        let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::zero());
+        let _candidate: Group<FormalCircuit> = a.cast_lossy();
+
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// cast_lossy of field (witness 0) to group");
+        println!("{}", output);
+    }
+
+    #[test]
+    fn formal_sample_field_1_cast_lossy_to_group() {
+        let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::one());
+        let _candidate: Group<FormalCircuit> = a.cast_lossy();
+
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// cast_lossy of field (witness 1) to group");
+        println!("{}", output);
+    }
+
+    #[test]
+    fn formal_sample_field_2_cast_lossy_to_group() {
+        let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("2field").unwrap());
+        let _candidate: Group<FormalCircuit> = a.cast_lossy();
+
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// cast_lossy of field (witness 2) to group");
+        println!("{}", output);
+    }
+
+    #[test]
+    fn formal_sample_field_3_cast_lossy_to_group() {
+        let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("3field").unwrap());
+        let _candidate: Group<FormalCircuit> = a.cast_lossy();
+
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// cast_lossy of field (witness 3) to group");
+        println!("{}", output);
+    }
+
 }

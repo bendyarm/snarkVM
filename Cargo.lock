@@ -2795,6 +2795,7 @@ version = "3.7.1"
 dependencies = [
  "anyhow",
  "rand",
+ "serde_json",
  "snarkvm-circuit-account",
  "snarkvm-circuit-algorithms",
  "snarkvm-circuit-collections",
@@ -2803,6 +2804,8 @@ dependencies = [
  "snarkvm-console",
  "snarkvm-console-account",
  "snarkvm-console-program",
+ "snarkvm-console-types-field",
+ "snarkvm-console-types-group",
  "snarkvm-utilities",
 ]
 
