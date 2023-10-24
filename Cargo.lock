@@ -2732,6 +2732,7 @@ dependencies = [
  "serde_json",
  "snarkvm-circuit-types",
  "snarkvm-console-algorithms",
+ "snarkvm-console-types-field",
  "snarkvm-curves",
  "snarkvm-fields",
  "snarkvm-utilities",

@@ -14,6 +14,10 @@ path = "../../console/algorithms"
 version = "=3.7.1"
 optional = true
 
+[dependencies.snarkvm-console-types-field]
+path = "../../console/types/field"
+version = "0.15.4"
+
 [dependencies.snarkvm-circuit-types]
 path = "../types"
 version = "=3.7.1"
