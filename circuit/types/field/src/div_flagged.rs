@@ -25,45 +25,60 @@ impl<E: Environment> DivFlagged<Field<E>> for Field<E> {
     type Output = (Field<E>, Boolean<E>);
 
     fn div_flagged(self, other: Field<E>) -> Self::Output {
-        // div.flagged r1 r2 into r3 r4
-        // becomes
-        // (r2) * (w1) = (1 - r4)  // r2=0 => r4=1; r2≠0 ∧ r4=0 => w1 = 1/r2
-        // (r2) * (r4) = (0)       // r2≠0 => r4=0
-        // (r1) * (w1) = (r3)      // r2≠0 => w1=(1/r2) => r3 = r1/r2
-        // (r3) * (r4) = (0)       // r2=0 => r4=1 => r3 = 0, and
-        //                     // r2≠0 => r4=0 ∧ r3 is not further constrained
-        // The first two constraints compute (1 - r4) = indicator(r2);
-        // the third constraint computes r3 as the quotient for the case
-        // when r2 is not zero;
-        // the fourth constraint forces r3 to zero when r2 is zero (and doesn't
-        // further constrain r3 when r2 is not zero, since in that case r4=0).
+        match other.is_constant() {
+            true => {
+                let other_value = other.eject_value();
+                if other_value.is_zero() {
+                    return (Field::zero(), Boolean::constant(true));
+                } else {
+                    return (self / other, Boolean::constant(false));
+                }
+            }
+            false => {
+                // TODO: look at whether we need to do something special for div_flagged constant nonconstant
 
-        // r1->self, r2->other, r3->quotient, r4->flag
+                // div.flagged r1 r2 into r3 r4
+                // becomes
+                // (r2) * (w1) = (1 - r4)  // r2=0 => r4=1; r2≠0 ∧ r4=0 => w1 = 1/r2
+                // (r2) * (r4) = (0)       // r2≠0 => r4=0
+                // (r1) * (w1) = (r3)      // r2≠0 => w1=(1/r2) => r3 = r1/r2
+                // (r3) * (r4) = (0)       // r2=0 => r4=1 => r3 = 0, and
+                //                     // r2≠0 => r4=0 ∧ r3 is not further constrained
+                // The first two constraints compute (1 - r4) = indicator(r2);
+                // the third constraint computes r3 as the quotient for the case
+                // when r2 is not zero;
+                // the fourth constraint forces r3 to zero when r2 is zero (and doesn't
+                // further constrain r3 when r2 is not zero, since in that case r4=0).
 
-        // TODO: refine mode handling
-        // Note that witness!() sets mode on the new circuit variable,
-        // so we want to make sure we are setting it correctly.
+                // r1->self, r2->other, r3->quotient, r4->flag
 
-        // The witness can be 0 when r2 is 0 (must be 1/r2 otherwise).
-        let w: Field<E> =
-            witness!(|other| { if other.is_zero() { console::Field::zero() } else { console::Field::one() / other } });
-        // r4 is 1 when the divisor is 0, otherwise 0.
-        let flag: Boolean<E> = witness!(|other| { other.is_zero() });
-        // (r1) * (w1) = (r3)
-        let quotient = self * &w;
+                // TODO: refine mode handling
+                // Note that witness!() sets mode on the new circuit variable,
+                // so we want to make sure we are setting it correctly.
 
-        // Enforce the remaining constraints
-        // (r1) * (w1) = (1 - r4)
-        E::enforce(|| (&other, &w, !&flag));
+                // The witness can be 0 when r2 is 0 (must be 1/r2 otherwise).
+                let w: Field<E> = witness!(|other| {
+                    if other.is_zero() { console::Field::zero() } else { console::Field::one() / other }
+                });
+                // r4 is 1 when the divisor is 0, otherwise 0.
+                let flag: Boolean<E> = witness!(|other| { other.is_zero() });
+                // (r1) * (w1) = (r3)
+                let quotient = self * &w;
 
-        // (r2) * (r4) = (0)
-        E::enforce(|| (&other, &flag, E::zero()));
+                // Enforce the remaining constraints
+                // (r1) * (w1) = (1 - r4)
+                E::enforce(|| (&other, &w, !&flag));
 
-        // (r3) * (r4) = (0)
-        E::enforce(|| (&quotient, &flag, E::zero()));
+                // (r2) * (r4) = (0)
+                E::enforce(|| (&other, &flag, E::zero()));
 
-        // Returns a boolean flag.
-        (quotient, flag)
+                // (r3) * (r4) = (0)
+                E::enforce(|| (&quotient, &flag, E::zero()));
+
+                // Returns a boolean flag.
+                (quotient, flag)
+            }
+        }
     }
 }
 
