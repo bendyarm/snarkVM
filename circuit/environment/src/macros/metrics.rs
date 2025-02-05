@@ -62,9 +62,17 @@ macro_rules! assert_count {
     ($operation:tt($input:ident) => $output:ident, $case:expr) => {{
         assert_count!($input<Circuit>, $operation<Output = $output<Circuit>>, $case)
     }};
+    // Unary case, returning two values
+    ($operation:tt($input:ident) => ($output:ident, $flag:ident), $case:expr) => {{
+        assert_count!($input<Circuit>, $operation<Output = ($output<Circuit>, $flag<Circuit>)>, $case)
+    }};
     // Binary case
     ($operation:tt($input_a:ident, $input_b:ident) => $output:ident, $case:expr) => {{
         assert_count!($input_a<Circuit>, $operation<$input_b<Circuit>, Output = $output<Circuit>>, $case)
+    }};
+    // Binary case, returning two values
+    ($operation:tt($input_a:ident, $input_b:ident) => ($output:ident, $flag:ident), $case:expr) => {{
+        assert_count!($input_a<Circuit>, $operation<$input_b<Circuit>, Output = ($output<Circuit>, $flag<Circuit>)>, $case)
     }};
     // Ternary case (special): Hardcoded for a conditional ternary operator.
     // Note: $input_b is not used, as the Ternary trait does not require one.
@@ -134,9 +142,17 @@ macro_rules! assert_count_fails {
     ($operation:tt($input:ident) => $output:ident, $case:expr) => {{
         assert_count_fails!($input<Circuit>, $operation<Output = $output<Circuit>>, $case)
     }};
+    // Unary case, returning two values
+    ($operation:tt($input:ident) => ($output:ident, $flag:ident), $case:expr) => {{
+        assert_count_fails!($input<Circuit>, $operation<Output = ($output<Circuit>, $flag<Circuit>)>, $case)
+    }};
     // Binary case
     ($operation:tt($input_a:ident, $input_b:ident) => $output:ident, $case:expr) => {{
         assert_count_fails!($input_a<Circuit>, $operation<$input_b<Circuit>, Output = $output<Circuit>>, $case)
+    }};
+    // Binary case, returning two values
+    ($operation:tt($input_a:ident, $input_b:ident) => ($output:ident, $flag:ident), $case:expr) => {{
+        assert_count_fails!($input_a<Circuit>, $operation<$input_b<Circuit>, Output = ($output<Circuit>, $flag<Circuit>)>, $case)
     }};
     // Ternary case (special): Hardcoded for a conditional ternary operator.
     // Note: $input_b is not used, as the Ternary trait does not require one.
@@ -200,9 +216,17 @@ macro_rules! assert_output_mode {
     ($operation:tt($input:ident) => $output:ident, $case:expr, $candidate:expr) => {{
         assert_output_mode!($input<Circuit>, $operation<Output = $output<Circuit>>, $case, $candidate)
     }};
+    // Unary case, returning two values
+    ($operation:tt($input:ident) => ($output:ident, $flag:ident), $case:expr, $candidate:expr) => {{
+        assert_output_mode!($input<Circuit>, $operation<Output = ($output<Circuit>, $flag<Circuit>)>, $case, $candidate)
+    }};
     // Binary case
     ($operation:tt($input_a:ident, $input_b:ident) => $output:ident, $case:expr, $candidate:expr) => {{
         assert_output_mode!($input_a<Circuit>, $operation<$input_b<Circuit>, Output = $output<Circuit>>, $case, $candidate)
+    }};
+    // Binary case, returning two values
+    ($operation:tt($input_a:ident, $input_b:ident) => ($output:ident, $flag:ident), $case:expr, $candidate:expr) => {{
+        assert_output_mode!($input_a<Circuit>, $operation<$input_b<Circuit>, Output = ($output<Circuit>, $flag<Circuit>)>, $case, $candidate)
     }};
     // Ternary case (special): Hardcoded for a conditional ternary operator.
     // Note: $input_b is not used, as the Ternary trait does not require one.

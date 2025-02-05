@@ -88,8 +88,10 @@ impl<E: Environment> Metrics<dyn DivFlagged<Field<E>, Output = (Field<E>, Boolea
     fn count(case: &Self::Case) -> Count {
         match case {
             (Mode::Constant, Mode::Constant) | (_, Mode::Constant) => Count::is(1, 0, 0, 0),
-            (Mode::Constant, _) => Count::is(0, 0, 1, 1),
-            (_, _) => Count::is(0, 0, 2, 2),
+            (Mode::Constant, _) => Count::is(0, 0, 2, 4),
+            // Note, 5 is one more than it looks like from the code.  Perhaps there is a bit constraint
+            // for the Boolean flag, even though the other constraints make a bit constraint unnecessary.
+            (_, _) => Count::is(0, 0, 3, 5),
         }
     }
 }
@@ -142,9 +144,8 @@ mod tests {
                 let (candidate, flag) = a.clone().div_flagged(b.clone());
                 assert_eq!(expected, candidate.eject_value(), "({} / {})", a.eject_value(), b.eject_value());
                 assert_eq!(flag.eject_value(), false);
-                // TODO: fix macros to handle tuple of outputs:
-                //assert_count!(DivFlagged(Field, Field) => (Field, Boolean), &(a.eject_mode(), b.eject_mode()));
-                //assert_output_mode!(DivFlagged(Field, Field) => (Field, Boolean), &(CircuitType::from(a), CircuitType::from(b)), candidate);
+                assert_count!(DivFlagged(Field, Field) => (Field, Boolean), &(a.eject_mode(), b.eject_mode()));
+                assert_output_mode!(DivFlagged(Field, Field) => (Field, Boolean), &(CircuitType::from(a), CircuitType::from(b)), candidate);
             });
         }
     }

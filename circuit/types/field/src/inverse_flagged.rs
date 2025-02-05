@@ -77,8 +77,8 @@ impl<E: Environment> Metrics<dyn InverseFlagged<Output = (Field<E>, Boolean<E>)>
 
     fn count(case: &Self::Case) -> Count {
         match case.is_constant() {
-            true => Count::is(1, 0, 0, 0),
-            false => Count::is(0, 0, 1, 1),
+            true => Count::is(3, 0, 0, 0),
+            false => Count::is(0, 0, 3, 4),
         }
     }
 }
@@ -127,9 +127,8 @@ mod tests {
                     let (result, flag) = a.inverse_flagged();
                     assert_eq!(expected, result.eject_value());
                     assert_eq!(flag.eject_value(), false);
-                    // TODO: fix macros to handle tuple of outputs:
-                    // assert_count!(InverseFlagged(Field) => (Field, Boolean), &mode);
-                    // assert_output_mode!(InverseFlagged(Field) => (Field, Boolean), &mode, result);
+                    assert_count!(InverseFlagged(Field) => (Field, Boolean), &mode);
+                    assert_output_mode!(InverseFlagged(Field) => (Field, Boolean), &mode, result);
                 });
             };
             Circuit::reset();
