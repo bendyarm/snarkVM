@@ -28,6 +28,9 @@ pub use cast::*;
 mod commit;
 pub use commit::*;
 
+mod div_flagged;
+pub use div_flagged::*;
+
 mod hash;
 pub use hash::*;
 

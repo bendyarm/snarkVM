@@ -267,6 +267,10 @@ pub fn cost_per_command<N: Network>(
                 FinalizeType::Future(_) => bail!("'div' does not support futures"),
             }
         }
+        Command::Instruction(Instruction::DivFlagged(divflagged)) => {
+            // TODO after PoC elaborate this
+            Ok(1_500)
+        }
         Command::Instruction(Instruction::DivWrapped(_)) => Ok(500),
         Command::Instruction(Instruction::Double(_)) => Ok(500),
         Command::Instruction(Instruction::GreaterThan(_)) => Ok(500),

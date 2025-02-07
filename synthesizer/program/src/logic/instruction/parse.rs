@@ -98,4 +98,13 @@ mod tests {
         assert_eq!(instruction, candidate.to_string());
         Ok(())
     }
+
+    #[test]
+    fn test_parse_flagged() -> Result<()> {
+        let instruction = "div.flagged r0 r1 into r2 r3;";
+        let (remainder, candidate) = Instruction::<CurrentNetwork>::parse(instruction)?;
+        assert_eq!("", remainder);
+        assert_eq!(instruction, candidate.to_string());
+        Ok(())
+    }
 }

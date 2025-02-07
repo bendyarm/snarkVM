@@ -102,6 +102,8 @@ pub enum Instruction<N: Network> {
     CommitPED128(CommitPED128<N>),
     /// Divides `first` by `second`, storing the outcome in `destination`.
     Div(Div<N>),
+    /// Divides `first` by `second`, storing the outcome in `destination` and the error flag in `flag`.
+    DivFlagged(DivFlagged<N>),
     /// Divides `first` by `second`, wrapping around at the boundary of the type, and storing the outcome in `destination`.
     DivWrapped(DivWrapped<N>),
     /// Doubles `first`, storing the outcome in `destination`.
@@ -251,6 +253,7 @@ macro_rules! instruction {
             CommitPED64,
             CommitPED128,
             Div,
+            DivFlagged,
             DivWrapped,
             Double,
             GreaterThan,
@@ -471,7 +474,7 @@ mod tests {
         // Sanity check the number of instructions is unchanged.
         // Note that the number of opcodes **MUST NOT** exceed u16::MAX.
         assert_eq!(
-            68,
+            69,  // 68 prior to adding div.flagged
             Instruction::<CurrentNetwork>::OPCODES.len(),
             "Update me if the number of instructions changes."
         );
