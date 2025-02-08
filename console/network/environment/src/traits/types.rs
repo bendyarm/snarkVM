@@ -81,6 +81,7 @@ pub trait FieldTrait:
     + for<'a> Div<&'a Self, Output = Self>
     + DivAssign<Self>
     + for<'a> DivAssign<&'a Self>
+    + DivFlagged
     + Double<Output = Self>
     + Eq
     + Equal

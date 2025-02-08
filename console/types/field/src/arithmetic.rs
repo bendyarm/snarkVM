@@ -181,6 +181,19 @@ impl<E: Environment> DivAssign<&Field<E>> for Field<E> {
     }
 }
 
+impl<E: Environment> DivFlagged<Field<E>> for Field<E> {
+    type Output = (Field<E>, Boolean<E>);
+
+    /// Returns the `quotient` of `self` and `other`, and a `Boolean` flag indicating if a divide-by-zero would have occurred.
+    #[inline]
+    fn div_flagged(&self, other: &Field<E>) -> Self::Output {
+        match other.is_zero() {
+            true => (Field::zero(), Boolean::new(true)),
+            false => (Field::new(self.field / other.field), Boolean::new(false)),
+        }
+    }
+}
+
 impl<E: Environment> Pow<Field<E>> for Field<E> {
     type Output = Field<E>;
 
@@ -220,6 +233,19 @@ impl<E: Environment> Inverse for Field<E> {
         match self.field.inverse() {
             Some(inverse) => Ok(Field::new(inverse)),
             None => bail!("Failed to invert a field element: {self}"),
+        }
+    }
+}
+
+impl<E: Environment> InverseFlagged for Field<E> {
+    type Output = (Field<E>, Boolean<E>);
+
+    /// Returns the `inverse` of `self`.
+    #[inline]
+    fn inverse_flagged(&self) -> Result<Self::Output> {
+        match self.field.inverse() {
+            Some(inverse) => Ok((Field::new(inverse), Boolean::new(false))),
+            None => Ok((Field::zero(), Boolean::new(true)))
         }
     }
 }

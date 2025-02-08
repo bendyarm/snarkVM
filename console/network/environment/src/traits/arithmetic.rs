@@ -64,6 +64,13 @@ pub trait DivWrapped<Rhs: ?Sized = Self> {
     fn div_wrapped(&self, rhs: &Rhs) -> Self::Output;
 }
 
+/// Binary operator for dividing two values, returning the quotient and a flag indicating if a divide-by-zero would have happened.
+pub trait DivFlagged<Rhs: ?Sized = Self> {
+    type Output;
+
+    fn div_flagged(&self, rhs: &Rhs) -> Self::Output;
+}
+
 /// Binary operator for modding two values.
 pub trait Modulo<Rhs: ?Sized = Self> {
     type Output;
@@ -211,6 +218,13 @@ pub trait Inverse {
     type Output;
 
     fn inverse(&self) -> Result<Self::Output>;
+}
+
+/// Unary operator for retrieving the inverse value, along with a flag indicating if the argument is zero.
+pub trait InverseFlagged {
+    type Output;
+
+    fn inverse_flagged(&self) -> Result<Self::Output>;
 }
 
 /// Unary operator for retrieving the squared value.
