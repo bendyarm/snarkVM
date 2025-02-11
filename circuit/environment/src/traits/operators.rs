@@ -22,11 +22,23 @@ pub use console::traits::{
 
 use crate::BooleanTrait;
 
+// Binary operator for dividing two field values without error but with an error flag.
+pub trait DivFlagged<Rhs = Self> {
+    type Output;
+    fn div_flagged(self, rhs: Rhs) -> Self::Output;
+}
+
 /// Unary operator for retrieving the inverse value.
 pub trait Inverse {
     type Output;
 
     fn inverse(&self) -> Self::Output;
+}
+
+// Unary operator for retrieving the inverse value without error but with an error flag.
+pub trait InverseFlagged {
+    type Output;
+    fn inverse_flagged(self) -> Self::Output;
 }
 
 /// Unary operator for retrieving the square root of the value.

@@ -15,12 +15,6 @@
 
 use super::*;
 
-// Define the InverseFlagged trait
-pub trait InverseFlagged {
-    type Output;
-    fn inverse_flagged(self) -> Self::Output;
-}
-
 impl<E: Environment> InverseFlagged for Field<E> {
     type Output = (Field<E>, Boolean<E>);
 

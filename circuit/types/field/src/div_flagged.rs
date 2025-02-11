@@ -15,12 +15,6 @@
 
 use super::*;
 
-// Define the DivFlagged trait
-pub trait DivFlagged<Rhs = Self> {
-    type Output;
-    fn div_flagged(self, rhs: Rhs) -> Self::Output;
-}
-
 impl<E: Environment> DivFlagged<Field<E>> for Field<E> {
     type Output = (Field<E>, Boolean<E>);
 
