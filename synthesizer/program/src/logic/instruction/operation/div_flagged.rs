@@ -95,6 +95,9 @@ impl<N: Network> DivFlagged<N> {
 
         // Divide.  (TODO: handle the standard case where the divisor is not zero)
         let (quotientval, flagval) = (Literal::Field(Field::zero()), Literal::Boolean(Boolean::new(true)));
+        // it should be something like this, but I don't know how to use .div_flagged on a Literal Field<N>
+        // or to convert the results back to Literal Field<N> and Boolean<N>
+        //let (quotientval, flagval) = dividend.div_flagged(&divisor);
 
         // Store the output.
         registers.store_literal(stack, &self.destination, quotientval)?;

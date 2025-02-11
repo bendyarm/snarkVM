@@ -29,7 +29,8 @@ mod commit;
 pub use commit::*;
 
 mod div_flagged;
-pub use div_flagged::*;
+// Note, there was some problem with `pub use div_flagged::*` not working
+pub use div_flagged::DivFlagged;
 
 mod hash;
 pub use hash::*;
