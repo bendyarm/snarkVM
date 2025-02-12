@@ -18,10 +18,10 @@ use crate::{
     Operand,
     traits::{RegistersLoad, RegistersLoadCircuit, RegistersStore, RegistersStoreCircuit, StackMatches, StackProgram},
 };
+use circuit::prelude::DivFlagged as CircuitDivFlagged;
 use console::{
     network::prelude::*,
     program::{Literal, LiteralType, PlaintextType, Register, RegisterType},
-    types::{Boolean, Field},
 };
 
 /// Computes whether `signature` is valid for the given `address` and `message`.
@@ -93,15 +93,14 @@ impl<N: Network> DivFlagged<N> {
             _ => bail!("Expected the second operand to be a field."),
         };
 
-        // Divide.  (TODO: handle the standard case where the divisor is not zero)
-        let (quotientval, flagval) = (Literal::Field(Field::zero()), Literal::Boolean(Boolean::new(true)));
-        // it should be something like this, but I don't know how to use .div_flagged on a Literal Field<N>
-        // or to convert the results back to Literal Field<N> and Boolean<N>
-        //let (quotientval, flagval) = dividend.div_flagged(&divisor);
+        // Divide.
+        let (quotient, flag) = console::prelude::DivFlagged::div_flagged(&dividend, &divisor);
+        let quotient_literal = Literal::Field(quotient);
+        let flag_literal = Literal::Boolean(flag);
 
         // Store the output.
-        registers.store_literal(stack, &self.destination, quotientval)?;
-        registers.store_literal(stack, &self.flag, flagval)?;
+        registers.store_literal(stack, &self.destination, quotient_literal)?;
+        registers.store_literal(stack, &self.flag, flag_literal)?;
 
         Ok(())
     }
@@ -127,13 +126,13 @@ impl<N: Network> DivFlagged<N> {
             _ => bail!("Expected the second operand to be a field."),
         };
 
-        // TODO, fix the rest of this
-        // Divide.  (TODO: handle the standard case where the divisor is not zero)
-        // let (quotientval, flagval) = ...;
+        // Divide.
+        let (quotient, flag) = CircuitDivFlagged::div_flagged(dividend, divisor);
+        let quotient_literal = circuit::Literal::Field(quotient);
+        let flag_literal = circuit::Literal::Boolean(flag);
 
-        // Store the output.
-        //registers.store_literal_circuit(stack, &self.destination, quotientval)?;
-        //registers.store_literal_circuit(stack, &self.flag, flagval)?;
+        registers.store_literal_circuit(stack, &self.destination, quotient_literal)?;
+        registers.store_literal_circuit(stack, &self.flag, flag_literal)?;
 
         Ok(())
     }
@@ -169,7 +168,7 @@ impl<N: Network> DivFlagged<N> {
             )
         }
 
-        // Ensure the second operand is an address.
+        // Ensure the second operand is an field.
         if input_types[1] != RegisterType::Plaintext(PlaintextType::Literal(LiteralType::Field)) {
             bail!(
                 "Instruction '{}' expects the second input to be a 'field'. Found input of type '{}'",
@@ -284,7 +283,7 @@ impl<N: Network> ToBytes for DivFlagged<N> {
         // Write the operands.
         self.operands.iter().try_for_each(|operand| operand.write_le(&mut writer))?;
         // Write the destination register.
-        self.destination.write_le(&mut writer);
+        self.destination.write_le(&mut writer)?;
         // Write the flag register.
         self.flag.write_le(&mut writer)
     }
