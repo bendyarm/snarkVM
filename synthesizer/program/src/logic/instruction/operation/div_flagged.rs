@@ -55,8 +55,8 @@ impl<N: Network> DivFlagged<N> {
     /// Returns the operands in the operation.
     #[inline]
     pub fn operands(&self) -> &[Operand<N>] {
-        // Sanity check that there are exactly three operands.
-        debug_assert!(self.operands.len() == 3, "Instruction '{}' must have three operands", Self::opcode());
+        // Sanity check that there are exactly two operands.
+        debug_assert!(self.operands.len() == 2, "Instruction '{}' must have two operands", Self::opcode());
         // Return the operands.
         &self.operands
     }
@@ -298,12 +298,12 @@ mod tests {
 
     #[test]
     fn test_parse() {
-        let (string, is) = DivFlagged::<CurrentNetwork>::parse("div.flagged r0 r1 into r3 r4").unwrap();
+        let (string, is) = DivFlagged::<CurrentNetwork>::parse("div.flagged r0 r1 into r2 r3").unwrap();
         assert!(string.is_empty(), "Parser did not consume all of the string: '{string}'");
         assert_eq!(is.operands.len(), 2, "The number of operands is incorrect");
         assert_eq!(is.operands[0], Operand::Register(Register::Locator(0)), "The first operand is incorrect");
         assert_eq!(is.operands[1], Operand::Register(Register::Locator(1)), "The second operand is incorrect");
-        assert_eq!(is.destination, Register::Locator(3), "The destination register is incorrect");
-        assert_eq!(is.flag, Register::Locator(4), "The flag register is incorrect");
+        assert_eq!(is.destination, Register::Locator(2), "The destination register is incorrect");
+        assert_eq!(is.flag, Register::Locator(3), "The flag register is incorrect");
     }
 }

@@ -83,7 +83,7 @@ impl<E: Environment> Metrics<dyn DivFlagged<Field<E>, Output = (Field<E>, Boolea
         match case {
             (Mode::Constant, Mode::Constant) | (_, Mode::Constant) => Count::is(1, 0, 0, 0),
             (Mode::Constant, _) => Count::is(0, 0, 2, 4),
-            // Note, 5 is one more than it looks like from the code.  Perhaps there is a bit constraint
+            // TODO: revisit this.  5 is one more than it looks like from the code.  Perhaps there is a bit constraint
             // for the Boolean flag, even though the other constraints make a bit constraint unnecessary.
             (_, _) => Count::is(0, 0, 3, 5),
         }
