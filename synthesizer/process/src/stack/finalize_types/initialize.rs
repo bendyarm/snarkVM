@@ -717,6 +717,13 @@ impl<N: Network> FinalizeTypes<N> {
                 );
             }
             Opcode::Hash(opcode) => RegisterTypes::check_hash_opcode(opcode, instruction)?,
+            Opcode::InverseFlagged => {
+                // Ensure the instruction has two destination registers.
+                ensure!(
+                    instruction.destinations().len() == 2,
+                    "Instruction '{instruction}' does not have two destinations."
+                );
+            }
             Opcode::Is(opcode) => match opcode {
                 "is.eq" => ensure!(
                     matches!(instruction, Instruction::IsEq(..)),

@@ -35,6 +35,9 @@ pub use div_flagged::DivFlagged;
 mod hash;
 pub use hash::*;
 
+mod inverse_flagged;
+pub use inverse_flagged::InverseFlagged;
+
 mod is;
 pub use is::*;
 
@@ -44,6 +47,7 @@ pub use literals::*;
 mod macros;
 
 mod sign_verify;
+
 pub use sign_verify::*;
 
 use crate::Opcode;

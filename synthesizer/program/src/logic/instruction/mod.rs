@@ -150,6 +150,8 @@ pub enum Instruction<N: Network> {
     HashManyPSD8(HashManyPSD8<N>),
     /// Computes the multiplicative inverse of `first`, storing the outcome in `destination`.
     Inv(Inv<N>),
+    /// Computes the multiplicative inverse of `first`, storing the outcome in `destination` and the error flag in `flag`.
+    InverseFlagged(InverseFlagged<N>),
     /// Computes whether `first` equals `second` as a boolean, storing the outcome in `destination`.
     IsEq(IsEq<N>),
     /// Computes whether `first` does **not** equals `second` as a boolean, storing the outcome in `destination`.
@@ -277,6 +279,7 @@ macro_rules! instruction {
             HashManyPSD4,
             HashManyPSD8,
             Inv,
+            InverseFlagged,
             IsEq,
             IsNeq,
             LessThan,

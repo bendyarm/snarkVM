@@ -19,50 +19,62 @@ impl<E: Environment> InverseFlagged for Field<E> {
     type Output = (Field<E>, Boolean<E>);
 
     fn inverse_flagged(self) -> Self::Output {
-        // inv.flagged r1 into r2 r3
-        // becomes
-        // (r1) * (w1) = (1 - r3)  // r1=0 => r3=1; r1≠0 ∧ r3=0 => w1 = 1/r1
-        // (r1) * (r3) - (0)       // r1≠0 => r3=0
-        // (w1) * (1 - r3) = (r2)  // r1=0 => r3=1 => r2=0; r1≠0 => r2=w1=1/r1
-        //
-        // The first two constraints compute (1 - r3) = indicator(r1);
-        // the third constraint multiplies that indicator by w1 to get r2, so
-        // if r1 was zero, r2 will be zero, and
-        // if r1 was non-zero, r2 will be 1/r1.
-
-        // r1->self, r2->inverse, r3->flag
-
-        // TODO: refine mode handling
-        let mode = if self.eject_mode() == Mode::Constant { Mode::Constant } else { Mode::Private };
-
-        // The witness can be 0 when r1 is 0 (must be 1/r1 otherwise).
-        // Init console_witness to zero but set it in witness!() below.
-        let mut console_witness = console::Field::zero();
-
-        let w: Field<E> = witness!(|self| {
-            if self.is_zero() {
-                console_witness = console::Field::zero();
-                console_witness
-            } else {
-                console_witness = console::Field::one() / self;
-                console_witness
+        match self.is_constant() {
+            true => {
+                let self_value = self.eject_value();
+                if self_value.is_zero() {
+                    return (Field::zero(), Boolean::constant(true));
+                } else {
+                    return (self.inverse(), Boolean::constant(false));
+                }
             }
-        });
-        // r3 is 1 when the divisor is 0, otherwise 0.
-        let flag: Boolean<E> = witness!(|self| { self.is_zero() });
+            false => {
+                // inv.flagged r1 into r2 r3
+                // becomes
+                // (r1) * (w1) = (1 - r3)  // r1=0 => r3=1; r1≠0 ∧ r3=0 => w1 = 1/r1
+                // (r1) * (r3) - (0)       // r1≠0 => r3=0
+                // (w1) * (1 - r3) = (r2)  // r1=0 => r3=1 => r2=0; r1≠0 => r2=w1=1/r1
+                //
+                // The first two constraints compute (1 - r3) = indicator(r1);
+                // the third constraint multiplies that indicator by w1 to get r2, so
+                // if r1 was zero, r2 will be zero, and
+                // if r1 was non-zero, r2 will be 1/r1.
 
-        // Enforce the constraints.
-        // (r1) * (w1) = (1 - r3)
-        E::enforce(|| (&self, &w, !&flag));
+                // r1->self, r2->inverse, r3->flag
 
-        // (r1) * (r3) = (0)
-        E::enforce(|| (&self, &flag, E::zero()));
+                // TODO: refine mode handling
+                let mode = if self.eject_mode() == Mode::Constant { Mode::Constant } else { Mode::Private };
 
-        // (w1) * (1 - r3) = (r2)
-        let inverse = Field::new(mode, console_witness);
-        E::enforce(|| (&w, !&flag, &inverse));
+                // The witness can be 0 when r1 is 0 (must be 1/r1 otherwise).
+                // Init console_witness to zero but set it in witness!() below.
+                let mut console_witness = console::Field::zero();
 
-        (inverse, flag)
+                let w: Field<E> = witness!(|self| {
+                    if self.is_zero() {
+                        console_witness = console::Field::zero();
+                        console_witness
+                    } else {
+                        console_witness = console::Field::one() / self;
+                        console_witness
+                    }
+                });
+                // r3 is 1 when the divisor is 0, otherwise 0.
+                let flag: Boolean<E> = witness!(|self| { self.is_zero() });
+
+                // Enforce the constraints.
+                // (r1) * (w1) = (1 - r3)
+                E::enforce(|| (&self, &w, !&flag));
+
+                // (r1) * (r3) = (0)
+                E::enforce(|| (&self, &flag, E::zero()));
+
+                // (w1) * (1 - r3) = (r2)
+                let inverse = Field::new(mode, console_witness);
+                E::enforce(|| (&w, !&flag, &inverse));
+
+                (inverse, flag)
+            }
+        }
     }
 }
 
@@ -71,7 +83,8 @@ impl<E: Environment> Metrics<dyn InverseFlagged<Output = (Field<E>, Boolean<E>)>
 
     fn count(case: &Self::Case) -> Count {
         match case.is_constant() {
-            true => Count::is(3, 0, 0, 0),
+            // TODO: revisit this.
+            true => Count::is(1, 0, 0, 0),
             false => Count::is(0, 0, 3, 4),
         }
     }

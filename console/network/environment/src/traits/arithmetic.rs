@@ -224,7 +224,7 @@ pub trait Inverse {
 pub trait InverseFlagged {
     type Output;
 
-    fn inverse_flagged(&self) -> Result<Self::Output>;
+    fn inverse_flagged(&self) -> Self::Output;
 }
 
 /// Unary operator for retrieving the squared value.

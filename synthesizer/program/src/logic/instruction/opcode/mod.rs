@@ -34,6 +34,8 @@ pub enum Opcode {
     DivFlagged,
     /// The opcode is for a hash operation (i.e. `hash.psd4`).
     Hash(&'static str),
+    /// The opcode is for a flagged inverse operation (i.e. `inv.flagged`)
+    InverseFlagged,
     /// The opcode is for an 'is' operation (i.e. `is.eq`).
     Is(&'static str),
     /// The opcode is for a literal operation (i.e. `add`).
@@ -56,6 +58,7 @@ impl Deref for Opcode {
             Opcode::Commit(opcode) => opcode,
             Opcode::DivFlagged => &"div.flagged",
             Opcode::Hash(opcode) => opcode,
+            Opcode::InverseFlagged => &"inv.flagged",
             Opcode::Is(opcode) => opcode,
             Opcode::Literal(opcode) => opcode,
             Opcode::Sign => &"sign.verify",
@@ -82,6 +85,7 @@ impl Display for Opcode {
             Self::Commit(opcode) => write!(f, "{opcode}"),
             Self::DivFlagged => write!(f, "{}", self.deref()),
             Self::Hash(opcode) => write!(f, "{opcode}"),
+            Self::InverseFlagged => write!(f, "{}", self.deref()),
             Self::Is(opcode) => write!(f, "{opcode}"),
             Self::Literal(opcode) => write!(f, "{opcode}"),
             Self::Sign => write!(f, "{}", self.deref()),

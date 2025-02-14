@@ -330,6 +330,10 @@ pub fn cost_per_command<N: Network>(
             bail!("`hash_many.psd8` is not supported in finalize")
         }
         Command::Instruction(Instruction::Inv(_)) => Ok(2_500),
+        Command::Instruction(Instruction::InverseFlagged(inverseflagged)) => {
+            // TODO after PoC elaborate this
+            Ok(2_500)
+        }
         Command::Instruction(Instruction::IsEq(_)) => Ok(500),
         Command::Instruction(Instruction::IsNeq(_)) => Ok(500),
         Command::Instruction(Instruction::LessThan(_)) => Ok(500),

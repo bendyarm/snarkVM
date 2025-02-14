@@ -240,12 +240,12 @@ impl<E: Environment> Inverse for Field<E> {
 impl<E: Environment> InverseFlagged for Field<E> {
     type Output = (Field<E>, Boolean<E>);
 
-    /// Returns the `inverse` of `self`.
+    /// Returns the `inverse` of `self`, along with a `Boolean` flag indicating if a divide-by-zero would have occurred.
     #[inline]
-    fn inverse_flagged(&self) -> Result<Self::Output> {
-        match self.field.inverse() {
-            Some(inverse) => Ok((Field::new(inverse), Boolean::new(false))),
-            None => Ok((Field::zero(), Boolean::new(true)))
+    fn inverse_flagged(&self) -> Self::Output {
+        match self.is_zero() {
+            true => (Field::zero(), Boolean::new(true)),
+            false => (Field::new(E::Field::one() / self.field), Boolean::new(false)),
         }
     }
 }
