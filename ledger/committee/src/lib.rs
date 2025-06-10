@@ -76,7 +76,7 @@ impl<N: Network> Committee<N> {
     pub fn new(starting_round: u64, members: IndexMap<Address<N>, (u64, bool, u8)>) -> Result<Self> {
         // Ensure there are at least 3 members.
         ensure!(members.len() >= 3, "Committee must have at least 3 members");
-        // Ensure there are no more than the maximum number of members.
+        // Ensure there are  no more than the maximum number of members.
         ensure!(
             members.len() <= Self::MAX_COMMITTEE_SIZE as usize,
             "Committee must have no more than {} members",

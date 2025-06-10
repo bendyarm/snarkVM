@@ -113,6 +113,16 @@ mod tests {
         assert_eq!("foo_bar1", candidate.to_string());
         assert_eq!("", remainder);
 
+        // Quick sanity check, capitalized.
+        let (remainder, candidate) = Identifier::<CurrentNetwork>::parse("Foo_bar1")?;
+        assert_eq!("Foo_bar1", candidate.to_string());
+        assert_eq!("", remainder);
+
+        // Quick sanity check, all uppercase
+        let (remainder, candidate) = Identifier::<CurrentNetwork>::parse("FOO_BAR1")?;
+        assert_eq!("FOO_BAR1", candidate.to_string());
+        assert_eq!("", remainder);
+
         // Must be alphanumeric or underscore.
         let (remainder, candidate) = Identifier::<CurrentNetwork>::parse("foo_bar~baz")?;
         assert_eq!("foo_bar", candidate.to_string());
@@ -122,6 +132,11 @@ mod tests {
         let (remainder, candidate) = Identifier::<CurrentNetwork>::parse("foo_bar-baz")?;
         assert_eq!("foo_bar", candidate.to_string());
         assert_eq!("-baz", remainder);
+
+        // Other keywords than type literals can parse as identifiers.
+        let (remainder, candidate) = Identifier::<CurrentNetwork>::parse("mapping")?;
+        assert_eq!("mapping", candidate.to_string());
+        assert_eq!("", remainder);
 
         let mut rng = TestRng::default();
 
@@ -181,6 +196,19 @@ mod tests {
             assert_eq!(expected_field, candidate.0);
             assert_eq!(expected_string.len(), candidate.1 as usize);
         }
+
+        // Just fit within the data capacity of a base field element.
+        // This is 31 bytes long.  31*8 = 248 bits.  32*8 = 256 bits, which would exceed the capacity.
+        // However, if a different field is used then this test will fail.
+        let identifier = Identifier::<CurrentNetwork>::from_str(
+            "foo_bar_baz_qux_quux_quuz_corge"
+        );
+        assert!(identifier.is_ok());
+
+        // An upcased version of a literal type would not fail.
+        let identifier = Identifier::<CurrentNetwork>::from_str("U8");
+        assert!(identifier.is_ok());
+
         Ok(())
     }
 
@@ -218,6 +246,10 @@ mod tests {
         let identifier = Identifier::<CurrentNetwork>::from_str(
             "foo_bar_baz_qux_quux_quuz_corge_grault_garply_waldo_fred_plugh_xyzzy",
         );
+        assert!(identifier.is_err());
+
+        // Must not be a literal type
+        let identifier = Identifier::<CurrentNetwork>::from_str("u8");
         assert!(identifier.is_err());
     }
 

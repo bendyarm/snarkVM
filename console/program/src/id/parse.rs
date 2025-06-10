@@ -74,8 +74,30 @@ mod tests {
 
         assert!(ProgramID::<CurrentNetwork>::parse("foo").is_err());
 
+        // Apparently, various keywords can be parsed as lowercase-identifier:
+        let id = ProgramID::<CurrentNetwork>::parse("mapping.aleo").unwrap().1;
+        assert_eq!(id.name(), &Identifier::<CurrentNetwork>::from_str("mapping")?);
+        assert_eq!(id.network(), &Identifier::<CurrentNetwork>::from_str("aleo")?);
+
+        let id = ProgramID::<CurrentNetwork>::parse("program.aleo").unwrap().1;
+        assert_eq!(id.name(), &Identifier::<CurrentNetwork>::from_str("program")?);
+        assert_eq!(id.network(), &Identifier::<CurrentNetwork>::from_str("aleo")?);
+
+        let id = ProgramID::<CurrentNetwork>::parse("function.aleo").unwrap().1;
+        assert_eq!(id.name(), &Identifier::<CurrentNetwork>::from_str("function")?);
+        assert_eq!(id.network(), &Identifier::<CurrentNetwork>::from_str("aleo")?);
+
         Ok(())
     }
+
+    // #[test]
+    // fn test_parser() -> Result<()> {
+    //     let id = ProgramID::<CurrentNetwork>::parse("bar.dork.aleo;").unwrap().1;
+    //     assert_eq!(id.name(), &Identifier::<CurrentNetwork>::from_str("bar")?);
+    //     assert_eq!(id.network(), &Identifier::<CurrentNetwork>::from_str("aleo")?);
+    //
+    //     Ok(())
+    // }
 
     #[test]
     fn test_display() -> Result<()> {

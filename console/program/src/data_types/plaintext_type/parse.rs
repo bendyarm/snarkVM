@@ -70,6 +70,7 @@ impl<N: Network> Display for PlaintextType<N> {
 mod tests {
     use super::*;
     use snarkvm_console_network::MainnetV0;
+    use crate::U32;
 
     type CurrentNetwork = MainnetV0;
 
@@ -84,6 +85,10 @@ mod tests {
             Ok(("", PlaintextType::<CurrentNetwork>::Literal(LiteralType::Signature)))
         );
         assert_eq!(
+            PlaintextType::parse("string"),
+            Ok(("", PlaintextType::<CurrentNetwork>::Literal(LiteralType::String)))
+        );
+        assert_eq!(
             PlaintextType::parse("foo"),
             Ok(("", PlaintextType::<CurrentNetwork>::Struct(Identifier::from_str("foo")?)))
         );
@@ -95,6 +100,34 @@ mod tests {
             PlaintextType::parse("[field; 1u32]"),
             Ok(("", PlaintextType::<CurrentNetwork>::Array(ArrayType::from_str("[field; 1u32]")?)))
         );
+        // The previous assertion effectively parses the string twice,
+        // once via PlaintextType::parse and once via ArrayType::from_str, both of which call ArrayType::parse.
+        // Here is a test that parses it once and then checks that the result has the right structure:
+        assert_eq!(
+            PlaintextType::parse("[field; 1u32]"),
+            Ok(("", PlaintextType::<CurrentNetwork>::Array(
+                ArrayType::<CurrentNetwork>::new(PlaintextType::Literal(LiteralType::Field),
+                                                 vec![U32::new(1)])?))));
+        // Make sure parsing a nested array consumes the entire string.
+        assert_eq!(
+            PlaintextType::<CurrentNetwork>::parse("[[field; 2u32]; 1u32]").unwrap().0,
+            "");
+
+        // Uncomment to double-check that we have the expected value for the constant that
+        // defines the maximum dimensions of an array.
+        // assert_eq!(MainnetV0::MAX_DATA_DEPTH, 32);
+
+        // Make sure parsing the deepest allowed array consumes the entire string.
+        let open_brackets = "[".repeat(MainnetV0::MAX_DATA_DEPTH);
+        let element_type_string = String::from("field");
+        let close_arrays = "; 1u32]".repeat(MainnetV0::MAX_DATA_DEPTH);
+        assert_eq!(
+            PlaintextType::<CurrentNetwork>::parse(format!("{}{}{}",
+                                                           open_brackets,
+                                                           element_type_string,
+                                                           close_arrays).as_str()).unwrap().0,
+            "");
+
         Ok(())
     }
 
@@ -170,6 +203,12 @@ mod tests {
             "foo_bar_baz_qux_quux_quuz_corge_grault_garply_waldo_fred_plugh_xyzzy",
         );
         assert!(struct_.is_err());
+
+        // Too deep an array
+        let open_brackets = "[".repeat(MainnetV0::MAX_DATA_DEPTH + 1);
+        let element_type_string = String::from("field");
+        let close_arrays = "; 1u32]".repeat(MainnetV0::MAX_DATA_DEPTH + 1);
+        assert!(PlaintextType::<CurrentNetwork>::parse(format!("{}{}{}", open_brackets, element_type_string, close_arrays).as_str()).is_err());
 
         Ok(())
     }

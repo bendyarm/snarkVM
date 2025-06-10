@@ -230,6 +230,7 @@ macro_rules! test_hash {
     }
 
 test_hash!(hash_bhp256, HashBHP256, ITERATIONS);
+
 test_hash!(hash_bhp512, HashBHP512, ITERATIONS);
 test_hash!(hash_bhp768, HashBHP768, ITERATIONS);
 test_hash!(hash_bhp1024, HashBHP1024, ITERATIONS);
