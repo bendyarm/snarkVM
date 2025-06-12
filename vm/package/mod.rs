@@ -17,7 +17,6 @@ mod build;
 mod clean;
 mod deploy;
 mod execute;
-mod info;
 mod is_build_required;
 mod run;
 

@@ -28,7 +28,7 @@ save_r1cs_hashes = [ "snarkvm-circuit-environment/save_r1cs_hashes" ]
 
 [dependencies.snarkvm-console-types-field]
 path = "../console/types/field"
-version = "0.14.6"
+version = "=3.7.1"
 
 [dependencies.serde_json]
 version = "1.0"
@@ -66,20 +66,20 @@ version = "=3.7.1"
 
 [dev-dependencies.snarkvm-console-types-integers]
 path = "../console/types/integers"
-version = "=0.14.6"
+version = "=3.7.1"
 
 [dev-dependencies.snarkvm-console-types-field]
 path = "../console/types/field"
-version = "0.15.4"
+version = "=3.7.1"
 
 [dev-dependencies.snarkvm-console-types-group]
 path = "../console/types/group"
-version = "=0.14.6"
+version = "=3.7.1"
 
 [dev-dependencies.snarkvm-console-types-scalar]
 path = "../console/types/scalar"
-version = "=0.14.6"
+version = "=3.7.1"
 
 [dev-dependencies.snarkvm-console-types-address]
 path = "../console/types/address"
-version = "=0.14.6"
+version = "=3.7.1"

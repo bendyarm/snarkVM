@@ -1,9 +1,10 @@
-// Copyright (C) 2019-2023 Aleo Systems Inc.
+// Copyright (c) 2019-2025 Provable Inc.
 // This file is part of the snarkVM library.
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at:
+
 // http://www.apache.org/licenses/LICENSE-2.0
 
 // Unless required by applicable law or agreed to in writing, software
@@ -14,7 +15,11 @@
 
 use crate::{Mode, *};
 
-use core::{cell::RefCell, fmt};
+use core::{
+    cell::{Cell, RefCell},
+    fmt,
+};
+
 use std::{fmt::Formatter, iter, rc::Rc};
 
 use serde::{Deserialize, Serialize};
@@ -22,6 +27,12 @@ use serde::{Deserialize, Serialize};
 type Field = <console::MainnetV0 as console::Environment>::Field;
 
 thread_local! {
+    static VARIABLE_LIMIT: Cell<Option<u64>> = const { Cell::new(None) };
+    static CONSTRAINT_LIMIT: Cell<Option<u64>> = const { Cell::new(None) };
+    pub(super) static FORMAL_CIRCUIT: RefCell<R1CS<Field>> = RefCell::new(R1CS::new());
+    static IN_WITNESS: Cell<bool> = const { Cell::new(false) };
+    static ZERO: LinearCombination<Field> = LinearCombination::zero();
+    static ONE: LinearCombination<Field> = LinearCombination::one();
     pub(super) static TRANSCRIPT: Rc<RefCell<ConstraintTranscript>> = Rc::new(RefCell::new(ConstraintTranscript::new()));
 }
 
@@ -36,12 +47,12 @@ impl Environment for FormalCircuit {
 
     /// Returns the `zero` constant.
     fn zero() -> LinearCombination<Self::BaseField> {
-        Circuit::zero()
+        ZERO.with(|zero| zero.clone())
     }
 
     /// Returns the `one` constant.
     fn one() -> LinearCombination<Self::BaseField> {
-        Circuit::one()
+        ONE.with(|one| one.clone())
     }
 
     /// Returns a new variable of the given mode and value.
@@ -131,6 +142,11 @@ impl Environment for FormalCircuit {
         Circuit::num_private()
     }
 
+    /// Returns the number of constant, public, and private variables in the entire circuit.
+    fn num_variables() -> u64 {
+        TESTNET_CIRCUIT.with(|circuit| circuit.borrow().num_variables())
+    }
+
     /// Returns the number of constraints in the entire circuit.
     fn num_constraints() -> u64 {
         Circuit::num_constraints()
@@ -166,6 +182,26 @@ impl Environment for FormalCircuit {
         Circuit::num_nonzeros_in_scope()
     }
 
+    /// Returns the variable limit for the circuit, if one exists.
+    fn get_variable_limit() -> Option<u64> {
+        None //VARIABLE_LIMIT.with(|current_limit| current_limit.get())
+    }
+
+    /// Sets the variable limit for the circuit.
+    fn set_variable_limit(limit: Option<u64>) {
+        //VARIABLE_LIMIT.with(|current_limit| current_limit.replace(limit));
+    }
+
+    /// Returns the constraint limit for the circuit, if one exists.
+    fn get_constraint_limit() -> Option<u64> {
+        None //CONSTRAINT_LIMIT.with(|current_limit| current_limit.get())
+    }
+
+    /// Sets the constraint limit for the circuit.
+    fn set_constraint_limit(limit: Option<u64>) {
+        //CONSTRAINT_LIMIT.with(|current_limit| current_limit.replace(limit));
+    }
+
     /// Halts the program from further synthesis, evaluation, and execution in the current environment.
     fn halt<S: Into<String>, T>(message: S) -> T {
         Circuit::halt(message)
@@ -189,16 +225,6 @@ impl Environment for FormalCircuit {
     /// Clears the circuit and initializes an empty environment.
     fn reset() {
         Circuit::reset()
-    }
-
-    /// Returns the constraint limit for the circuit, if one exists.
-    fn get_constraint_limit() -> Option<u64> {
-        None //CONSTRAINT_LIMIT.with(|current_limit| current_limit.get())
-    }
-
-    /// Sets the constraint limit for the circuit.
-    fn set_constraint_limit(limit: Option<u64>) {
-        //CONSTRAINT_LIMIT.with(|current_limit| current_limit.replace(limit));
     }
 }
 

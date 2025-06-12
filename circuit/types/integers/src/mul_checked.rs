@@ -124,7 +124,7 @@ impl<E: Environment, I: IntegerType> Integer<E, I> {
     /// Multiply the integer bits of `this` and `that`, while checking for an overflow.
     /// This function assumes that `this` and `that` are non-negative.
     #[inline]
-    pub(super) fn mul_with_carry(this: &Integer<E, I>, that: &Integer<E, I>) -> (Integer<E, I>, Vec<Boolean<E>>) {
+    fn mul_and_check(this: &Integer<E, I>, that: &Integer<E, I>) -> Integer<E, I> {
         // Case 1 - 2 integers fit in 1 field element (u8, u16, u32, u64, i8, i16, i32, i64).
         if 2 * I::BITS < (E::BaseField::size_in_bits() - 1) as u64 {
             // Instead of multiplying the bits of `self` and `other`, witness the integer product.

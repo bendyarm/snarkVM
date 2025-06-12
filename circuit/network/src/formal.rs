@@ -1,9 +1,10 @@
-// Copyright (C) 2019-2023 Aleo Systems Inc.
+// Copyright (c) 2019-2025 Provable Inc.
 // This file is part of the snarkVM library.
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at:
+
 // http://www.apache.org/licenses/LICENSE-2.0
 
 // Unless required by applicable law or agreed to in writing, software
@@ -76,9 +77,9 @@ thread_local! {
     static KECCAK_512: Keccak512<FormalV0> = Keccak512::<FormalV0>::new();
 
     /// The SHA-3 hash function.
-    static SHA_3_256: Sha3_256<FormalV0> = Sha3_256::<FormalV0>::new();
-    static SHA_3_384: Sha3_384<FormalV0> = Sha3_384::<FormalV0>::new();
-    static SHA_3_512: Sha3_512<FormalV0> = Sha3_512::<FormalV0>::new();
+    static SHA3_256: Sha3_256<FormalV0> = Sha3_256::<FormalV0>::new();
+    static SHA3_384: Sha3_384<FormalV0> = Sha3_384::<FormalV0>::new();
+    static SHA3_512: Sha3_512<FormalV0> = Sha3_512::<FormalV0>::new();
 
     /// The Pedersen hash function, which can take an input of up to 64 bits.
     static PEDERSEN_64: Pedersen64<FormalV0> = Pedersen64::<FormalV0>::constant(console::PEDERSEN_64.clone());
@@ -97,6 +98,29 @@ thread_local! {
 pub struct FormalV0;
 
 impl Aleo for FormalV0 {
+    /// Initializes the global constants for the Aleo environment.
+    fn initialize_global_constants() {
+        GENERATOR_G.with(|_| ());
+        ENCRYPTION_DOMAIN.with(|_| ());
+        GRAPH_KEY_DOMAIN.with(|_| ());
+        SERIAL_NUMBER_DOMAIN.with(|_| ());
+        BHP_256.with(|_| ());
+        BHP_512.with(|_| ());
+        BHP_768.with(|_| ());
+        BHP_1024.with(|_| ());
+        KECCAK_256.with(|_| ());
+        KECCAK_384.with(|_| ());
+        KECCAK_512.with(|_| ());
+        PEDERSEN_64.with(|_| ());
+        PEDERSEN_128.with(|_| ());
+        POSEIDON_2.with(|_| ());
+        POSEIDON_4.with(|_| ());
+        POSEIDON_8.with(|_| ());
+        SHA3_256.with(|_| ());
+        SHA3_384.with(|_| ());
+        SHA3_512.with(|_| ());
+    }
+    
     /// Returns the encryption domain as a constant field element.
     fn encryption_domain() -> Field<Self> {
         ENCRYPTION_DOMAIN.with(|domain| domain.clone())
@@ -220,17 +244,17 @@ impl Aleo for FormalV0 {
 
     /// Returns the SHA-3 hash with an output of 256-bits.
     fn hash_sha3_256(input: &[Boolean<Self>]) -> Vec<Boolean<FormalV0>> {
-        SHA_3_256.with(|sha3| sha3.hash(input))
+        SHA3_256.with(|sha3| sha3.hash(input))
     }
 
     /// Returns the SHA-3 hash with an output of 256-bits.
     fn hash_sha3_384(input: &[Boolean<Self>]) -> Vec<Boolean<FormalV0>> {
-        SHA_3_384.with(|sha3| sha3.hash(input))
+        SHA3_384.with(|sha3| sha3.hash(input))
     }
 
     /// Returns the SHA-3 hash with an output of 512-bits.
     fn hash_sha3_512(input: &[Boolean<Self>]) -> Vec<Boolean<FormalV0>> {
-        SHA_3_512.with(|sha3| sha3.hash(input))
+        SHA3_512.with(|sha3| sha3.hash(input))
     }
 
     /// Returns the Pedersen hash for a given (up to) 64-bit input.
@@ -422,6 +446,11 @@ impl Environment for FormalV0 {
         E::num_private()
     }
 
+    /// Returns the number of constant, public, and private variables in the entire circuit.
+    fn num_variables() -> u64 {
+        E::num_variables()
+    }
+
     /// Returns the number of constraints in the entire circuit.
     fn num_constraints() -> u64 {
         E::num_constraints()
@@ -457,6 +486,26 @@ impl Environment for FormalV0 {
         E::num_nonzeros_in_scope()
     }
 
+    /// Returns the variable limit for the circuit, if one exists.
+    fn get_variable_limit() -> Option<u64> {
+        E::get_variable_limit()
+    }
+
+    /// Sets the variable limit for the circuit.
+    fn set_variable_limit(limit: Option<u64>) {
+        E::set_variable_limit(limit)
+    }
+
+    /// Returns the constraint limit for the circuit, if one exists.
+    fn get_constraint_limit() -> Option<u64> {
+        E::get_constraint_limit()
+    }
+
+    /// Sets the constraint limit for the circuit.
+    fn set_constraint_limit(limit: Option<u64>) {
+        E::set_constraint_limit(limit)
+    }
+
     /// Halts the program from further synthesis, evaluation, and execution in the current environment.
     fn halt<S: Into<String>, T>(message: S) -> T {
         E::halt(message)
@@ -480,16 +529,6 @@ impl Environment for FormalV0 {
     /// Clears the circuit and initializes an empty environment.
     fn reset() {
         E::reset()
-    }
-
-    /// Returns the constraint limit for the circuit, if one exists.
-    fn get_constraint_limit() -> Option<u64> {
-        None //CONSTRAINT_LIMIT.with(|current_limit| current_limit.get())
-    }
-
-    /// Sets the constraint limit for the circuit.
-    fn set_constraint_limit(limit: Option<u64>) {
-        //CONSTRAINT_LIMIT.with(|current_limit| current_limit.replace(limit));
     }
 }
 

@@ -408,14 +408,10 @@ impl Circuit {
 impl Transcribe for Circuit {
     type Transcript = ();
 
-    /// Clears and returns the accumulated transcript.
+    fn push() { }
+    fn pop() { }
+    fn log(message: String) { }
     fn clear() -> Self::Transcript {}
-}
-
-impl fmt::Display for Circuit {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        CIRCUIT.with(|circuit| write!(f, "{}", (**circuit).borrow()))
-    }
 }
 
 #[cfg(test)]

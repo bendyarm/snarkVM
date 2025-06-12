@@ -48,6 +48,7 @@ use snarkvm_circuit_types::{
 };
 
 use core::fmt;
+use snarkvm_circuit_types::environment::Transcribe;
 
 type E = TestnetCircuit;
 
@@ -533,6 +534,15 @@ impl Environment for AleoTestnetV0 {
     /// Clears the circuit and initializes an empty environment.
     fn reset() {
         E::reset()
+    }
+}
+
+impl Transcribe for AleoTestnetV0 {
+    type Transcript = <E as Transcribe>::Transcript;
+
+    /// Clears and returns the accumulated transcript.
+    fn clear() -> Self::Transcript {
+        E::clear()
     }
 }
 
