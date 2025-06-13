@@ -48,6 +48,97 @@ mod i8 {
         U8 as ConsoleU8,
     };
 
+    // ------------------------------------------------------------
+    // mul checked samples
+
+    // separate sample for mul_and_check which is a component of mul_checked
+    #[test]
+    fn mul_and_check_var_var() {
+        let a = I8::<FormalCircuit>::new(Mode::Private, ConsoleI8::new(0i8));
+        let b = I8::<FormalCircuit>::new(Mode::Private, ConsoleI8::new(1i8));
+        let _candidate = snarkvm_circuit_types::integers::I8::mul_and_check(&a, &b);
+
+        // print FormalCircuit to JSON in console
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// mul_and_check i8 private var with i8 private var");
+        println!("{}", output);
+    }
+
+    // var * var
+    #[test]
+    fn mul_checked_var_var() {
+        let a = I8::<FormalCircuit>::new(Mode::Private, ConsoleI8::new(0i8));
+        let b = I8::<FormalCircuit>::new(Mode::Private, ConsoleI8::new(1i8));
+        let _candidate = &a * &b; // '*' on integers turns into a.mul_checked(b)
+
+        // print FormalCircuit to JSON in console
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// mul (checked) i8 private var with i8 private var");
+        println!("{}", output);
+    }
+
+    // mul constant 0
+    #[test]
+    fn mul_checked_0_var() {
+        let a = I8::<FormalCircuit>::new(Mode::Constant, ConsoleI8::zero());
+        let b = I8::<FormalCircuit>::new(Mode::Private, ConsoleI8::new(1i8));
+        let _candidate = &a * &b; // '*' on integers turns into a.mul_checked(b)
+
+        // print FormalCircuit to JSON in console
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// mul (checked) 0i8 constant with i8 private var");
+        println!("{}", output);
+    }
+
+    // mul constant 1
+    #[test]
+    fn mul_checked_1_var() {
+        let a = I8::<FormalCircuit>::new(Mode::Constant, ConsoleI8::new(1i8));
+        let b = I8::<FormalCircuit>::new(Mode::Private, ConsoleI8::new(1i8));
+        let _candidate = &a * &b; // '*' on integers turns into a.mul_checked(b)
+
+        // print FormalCircuit to JSON in console
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// mul (checked) 1i8 constant with i8 private var");
+        println!("{}", output);
+    }
+
+    // mul constant 1 in the other order
+    #[test]
+    fn mul_checked_var_1() {
+        let a = I8::<FormalCircuit>::new(Mode::Private, ConsoleI8::new(1i8));
+        let b = I8::<FormalCircuit>::new(Mode::Constant, ConsoleI8::new(1i8));
+        let _candidate = &a * &b; // '*' on integers turns into a.mul_checked(b)
+
+        // print FormalCircuit to JSON in console
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// mul (checked) i8 private var with 1i8 constant");
+        println!("{}", output);
+    }
+
+    // Try mul of a larger constant.  This is 2^7 - 2.
+    // Note, this constant can also be made with ConsoleI8::from_str("126I8").unwrap());
+    #[test]
+    fn mul_checked_N_var() {
+        let a = I8::<FormalCircuit>::new(Mode::Constant, ConsoleI8::new(126i8));
+        let b = I8::<FormalCircuit>::new(Mode::Private, ConsoleI8::new(1i8));
+        let _candidate = &a * &b; // '*' on integers turns into a.mul_checked(b)
+
+        // print FormalCircuit to JSON in console
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// mul (checked) large i8 constant with i8 private var");
+        println!("{}", output);
+    }
+
+    // ------------------------------------------------------------
+    // shift samples
+
     #[test]
     fn shl_checked_var_var() {
         let a = I8::<FormalCircuit>::new(Mode::Private, ConsoleI8::new(1i8));
