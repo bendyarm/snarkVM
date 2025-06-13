@@ -29,6 +29,7 @@ mod i128 {
     use snarkvm_console_types_integers::{
         AddWrapped,
         MulWrapped,
+        MulChecked,
         PowChecked,
         PowWrapped,
         SubWrapped,
@@ -349,19 +350,22 @@ mod i128 {
 
     // for ops see circuit/types/integers/{mul_checked,mul_wrapped}.rs
 
-    // mul with carry of var and var
+    // separate sample for mul_and_check which is a component of mul_checked
     #[test]
-    fn mul_with_carry_var_var() {
+    fn mul_and_check_var_var() {
         let a = I128::<FormalCircuit>::new(Mode::Private, ConsoleI128::new(0i128));
         let b = I128::<FormalCircuit>::new(Mode::Private, ConsoleI128::new(1i128));
-        let (_candidate1, _candidate2) = snarkvm_circuit_types::integers::I128::mul_with_carry(&a, &b);
+        let _candidate = snarkvm_circuit_types::integers::I128::mul_and_check(&a, &b);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// mul with carry i128 private var with i128 private var");
+        println!("// mul_and_check i128 private var with i128 private var");
         println!("{}", output);
     }
+
+    // ------------------------------------------------------------
+    // mul checked samples
 
     // var * var
     #[test]
@@ -419,11 +423,11 @@ mod i128 {
         println!("{}", output);
     }
 
-    // Try muling a larger constant.  This is 2^64 - 2.
-    // Note, this constant can also be made with ConsoleI128::from_str("9223372036854775806I128").unwrap());
+    // Try mul of a larger constant.  This is 2^127 - 2.
+    // Note, this constant can also be made with ConsoleI128::from_str("170141183460469231731687303715884105726I128").unwrap());
     #[test]
     fn mul_checked_N_var() {
-        let a = I128::<FormalCircuit>::new(Mode::Constant, ConsoleI128::new(9223372036854775806i128));
+        let a = I128::<FormalCircuit>::new(Mode::Constant, ConsoleI128::new(170141183460469231731687303715884105726i128));
         let b = I128::<FormalCircuit>::new(Mode::Private, ConsoleI128::new(1i128));
         let _candidate = &a * &b; // '*' on integers turns into a.mul_checked(b)
 
@@ -433,6 +437,9 @@ mod i128 {
         println!("// mul (checked) large i128 constant with i128 private var");
         println!("{}", output);
     }
+
+    // ------------------------------------------------------------
+    // mul wrapped samples
 
     #[test]
     fn mul_wrapped_var_var() {

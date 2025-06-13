@@ -410,19 +410,22 @@ mod i64 {
 
     // for ops see circuit/types/integers/{mul_checked,mul_wrapped}.rs
 
-    // mul with carry of var and var
+    // separate sample for mul_and_check which is a component of mul_checked
     #[test]
-    fn mul_with_carry_var_var() {
+    fn mul_and_check_var_var() {
         let a = I64::<FormalCircuit>::new(Mode::Private, ConsoleI64::new(0i64));
         let b = I64::<FormalCircuit>::new(Mode::Private, ConsoleI64::new(1i64));
-        let (_candidate1, _candidate2) = snarkvm_circuit_types::integers::I64::mul_with_carry(&a, &b);
+        let _candidate = snarkvm_circuit_types::integers::I64::mul_and_check(&a, &b);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// mul with carry i64 private var with i64 private var");
+        println!("// mul_and_check i64 private var with i64 private var");
         println!("{}", output);
     }
+
+    // ------------------------------------------------------------
+    // mul checked samples
 
     // var * var
     #[test]
@@ -480,7 +483,7 @@ mod i64 {
         println!("{}", output);
     }
 
-    // Try muling a larger constant.  This is 2^64 - 2.
+    // Try mul of a larger constant.  This is 2^63 - 2.
     // Note, this constant can also be made with ConsoleI64::from_str("9223372036854775806I64").unwrap());
     #[test]
     fn mul_checked_N_var() {
@@ -494,6 +497,9 @@ mod i64 {
         println!("// mul (checked) large i64 constant with i64 private var");
         println!("{}", output);
     }
+
+    // ------------------------------------------------------------
+    // mul wrapped samples
 
     #[test]
     fn mul_wrapped_var_var() {
