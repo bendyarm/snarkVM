@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use snarkvm_circuit_types::environment::{Circuit, FormalCircuit};
 use super::*;
 
 impl<E: Environment, const RATE: usize> Hash for Poseidon<E, RATE> {
@@ -118,7 +119,7 @@ mod tests {
 
 }
 
-#[cfg(all(test, console))]
+#[cfg(all(test, feature = "console"))]
 mod tests2 {
     use super::*;
     use snarkvm_circuit_types::environment::{Circuit,
@@ -138,24 +139,24 @@ mod tests2 {
     const RATE: usize = 2;
 
     #[test]
-    // Note: it seems wrong that this outputs 0 constraints.
-
     // Circuit for poseidon rate 2 with zero inputs (empty input vector)
+    // Note: this outputs 0 constraints because all the inputs are constants.
     fn psd_rate2_0() -> Result<()> {
 
         let native = console::Poseidon::<<Circuit as Environment>::Network, RATE>::setup(DOMAIN)?;
         //let poseidon = Poseidon::<Circuit, RATE>::constant(native.clone());
 
         let p = Poseidon2::<FormalCircuit>::new(Mode::Private, native.clone());
-        let _candidate = Poseidon2::hash(&p,&[]);
+        let _candidate = Poseidon2::hash(&p, &[]);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// psd2 of 0 input fields ({} constraints)",transcript.entries.len());
+        println!("// psd2 of 0 input fields ({} constraints)", transcript.entries.len());
         println!("{}", output);
         Ok(())
     }
+
     #[test]
     // Circuit for poseidon rate 2 with a single field element input
     fn psd_rate2_1() -> Result<()> {
@@ -165,12 +166,34 @@ mod tests2 {
 
         let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::zero());
         let p = Poseidon2::<FormalCircuit>::new(Mode::Private, native.clone());
-        let _candidate = Poseidon2::hash(&p,&[a]);
+        let _candidate = Poseidon2::hash(&p, &[a]);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// psd2 of 1 input field ({} constraints)",transcript.entries.len());
+        println!("// psd2 of 1 input field ({} constraints)", transcript.entries.len());
+        println!("{}", output);
+        Ok(())
+    }
+
+    #[test]
+    // Circuit for poseidon rate 2 with a single field element input (and a dummy input)
+    fn psd_rate2_1_with_dummy_mul() -> Result<()> {
+        let native = console::Poseidon::<<Circuit as Environment>::Network, RATE>::setup(DOMAIN)?;
+        //let poseidon = Poseidon::<Circuit, RATE>::constant(native.clone());
+
+        let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::zero());
+        let p = Poseidon2::<FormalCircuit>::new(Mode::Private, native.clone());
+        let result = Poseidon2::hash(&p, &[a]);
+
+        // In order to complete the calculation in the circuit, try multiplying by a dummy field element
+        let d = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::one());
+        let _candidate = result * d;
+
+        // print FormalCircuit to JSON in console
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// psd2 of 1 input field, with dummy mul at end ({} constraints)", transcript.entries.len());
         println!("{}", output);
         Ok(())
     }
@@ -185,12 +208,12 @@ mod tests2 {
         let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::zero());
         let b = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::one());
         let p = Poseidon2::<FormalCircuit>::new(Mode::Private, native.clone());
-        let _candidate = Poseidon2::hash(&p,&[a, b]);
+        let _candidate = Poseidon2::hash(&p, &[a, b]);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// psd2 of 2 input fields ({} constraints)",transcript.entries.len());
+        println!("// psd2 of 2 input fields ({} constraints)", transcript.entries.len());
         println!("{}", output);
         Ok(())
     }
@@ -206,18 +229,42 @@ mod tests2 {
         let b = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::one());
         let c = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("2field").unwrap());
         let p = Poseidon2::<FormalCircuit>::new(Mode::Private, native.clone());
-        let _candidate = Poseidon2::hash(&p,&[a, b, c]);
+        let _candidate = Poseidon2::hash(&p, &[a, b, c]);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// psd2 of 3 input fields ({} constraints)",transcript.entries.len());
+        println!("// psd2 of 3 input fields ({} constraints)", transcript.entries.len());
+        println!("{}", output);
+        Ok(())
+    }
+
+    #[test]
+    // Circuit for poseidon rate 2 with a single field element input (and a dummy input)
+    fn psd_rate2_3_with_dummy_mul() -> Result<()> {
+        let native = console::Poseidon::<<Circuit as Environment>::Network, RATE>::setup(DOMAIN)?;
+        //let poseidon = Poseidon::<Circuit, RATE>::constant(native.clone());
+
+        let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::zero());
+        let b = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::one());
+        let c = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("2field").unwrap());
+        let p = Poseidon2::<FormalCircuit>::new(Mode::Private, native.clone());
+        let result = Poseidon2::hash(&p, &[a, b, c]);
+
+        // In order to complete the calculation in the circuit, try multiplying by a dummy field element
+        let d = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("3field").unwrap());
+        let _candidate = result * d;
+
+        // print FormalCircuit to JSON in console
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// psd2 of 3 input fields, with dummy mul at end ({} constraints)", transcript.entries.len());
         println!("{}", output);
         Ok(())
     }
 }
 
-#[cfg(all(test, console))]
+#[cfg(all(test, feature = "console"))]
 mod tests4 {
     use super::*;
     use snarkvm_circuit_types::environment::{Circuit,
@@ -237,24 +284,24 @@ mod tests4 {
     const RATE: usize = 4;
 
     #[test]
-    // Note: it seems wrong that this outputs 0 constraints.
-
     // Circuit for poseidon rate 4 with zero inputs (empty input vector)
+    // Note: this outputs 0 constraints because all the inputs are constants.
     fn psd_rate4_0() -> Result<()> {
 
         let native = console::Poseidon::<<Circuit as Environment>::Network, RATE>::setup(crate::poseidon::hash::tests4::DOMAIN)?;
         //let poseidon = Poseidon::<Circuit, RATE>::constant(native.clone());
 
         let p = Poseidon4::<FormalCircuit>::new(Mode::Private, native.clone());
-        let _candidate = Poseidon4::hash(&p,&[]);
+        let _candidate = Poseidon4::hash(&p, &[]);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// psd4 of 0 input fields ({} constraints)",transcript.entries.len());
+        println!("// psd4 of 0 input fields ({} constraints)", transcript.entries.len());
         println!("{}", output);
         Ok(())
     }
+
     #[test]
     // Circuit for poseidon rate 4 with a single field element input
     fn psd_rate4_1() -> Result<()> {
@@ -264,12 +311,34 @@ mod tests4 {
 
         let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::zero());
         let p = Poseidon4::<FormalCircuit>::new(Mode::Private, native.clone());
-        let _candidate = Poseidon4::hash(&p,&[a]);
+        let _candidate = Poseidon4::hash(&p, &[a]);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// psd4 of 1 input field ({} constraints)",transcript.entries.len());
+        println!("// psd4 of 1 input field ({} constraints)", transcript.entries.len());
+        println!("{}", output);
+        Ok(())
+    }
+
+    #[test]
+    // Circuit for poseidon rate 4 with a single field element input (and a dummy input)
+    fn psd_rate4_1_with_dummy_mul() -> Result<()> {
+        let native = console::Poseidon::<<Circuit as Environment>::Network, RATE>::setup(DOMAIN)?;
+        //let poseidon = Poseidon::<Circuit, RATE>::constant(native.clone());
+
+        let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::zero());
+        let p = Poseidon4::<FormalCircuit>::new(Mode::Private, native.clone());
+        let result = Poseidon4::hash(&p, &[a]);
+
+        // In order to complete the calculation in the circuit, try multiplying by a dummy field element
+        let d = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::one());
+        let _candidate = result * d;
+
+        // print FormalCircuit to JSON in console
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// psd4 of 1 input field, with dummy mul at end ({} constraints)", transcript.entries.len());
         println!("{}", output);
         Ok(())
     }
@@ -284,12 +353,12 @@ mod tests4 {
         let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::zero());
         let b = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::one());
         let p = Poseidon4::<FormalCircuit>::new(Mode::Private, native.clone());
-        let _candidate = Poseidon4::hash(&p,&[a, b]);
+        let _candidate = Poseidon4::hash(&p, &[a, b]);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// psd4 of 2 input fields ({} constraints)",transcript.entries.len());
+        println!("// psd4 of 2 input fields ({} constraints)", transcript.entries.len());
         println!("{}", output);
         Ok(())
     }
@@ -305,12 +374,12 @@ mod tests4 {
         let b = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::one());
         let c = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("2field").unwrap());
         let p = Poseidon4::<FormalCircuit>::new(Mode::Private, native.clone());
-        let _candidate = Poseidon4::hash(&p,&[a, b, c]);
+        let _candidate = Poseidon4::hash(&p, &[a, b, c]);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// psd4 of 3 input fields ({} constraints)",transcript.entries.len());
+        println!("// psd4 of 3 input fields ({} constraints)", transcript.entries.len());
         println!("{}", output);
         Ok(())
     }
@@ -327,12 +396,12 @@ mod tests4 {
         let c = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("2field").unwrap());
         let d = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("3field").unwrap());
         let p = Poseidon4::<FormalCircuit>::new(Mode::Private, native.clone());
-        let _candidate = Poseidon4::hash(&p,&[a, b, c, d]);
+        let _candidate = Poseidon4::hash(&p, &[a, b, c, d]);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// psd4 of 4 input fields ({} constraints)",transcript.entries.len());
+        println!("// psd4 of 4 input fields ({} constraints)", transcript.entries.len());
         println!("{}", output);
         Ok(())
     }
@@ -350,12 +419,39 @@ mod tests4 {
         let d = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("3field").unwrap());
         let e = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("4field").unwrap());
         let p = Poseidon4::<FormalCircuit>::new(Mode::Private, native.clone());
-        let _candidate = Poseidon4::hash(&p,&[a, b, c, d, e]);
+        let _candidate = Poseidon4::hash(&p, &[a, b, c, d, e]);
 
         // print FormalCircuit to JSON in console
         let transcript = FormalCircuit::clear();
         let output = serde_json::to_string_pretty(&transcript).unwrap();
-        println!("// psd4 of 5 input fields ({} constraints)",transcript.entries.len());
+        println!("// psd4 of 5 input fields ({} constraints)", transcript.entries.len());
+        println!("{}", output);
+        Ok(())
+    }
+
+    #[test]
+    // Circuit for poseidon rate 4 with five field elements input  (and a dummy input)
+    fn psd_rate4_5_with_dummy_mul() -> Result<()> {
+
+        let native = console::Poseidon::<<Circuit as Environment>::Network, RATE>::setup(crate::poseidon::hash::tests4::DOMAIN)?;
+        //let poseidon = Poseidon::<Circuit, RATE>::constant(native.clone());
+
+        let a = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::zero());
+        let b = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::one());
+        let c = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("2field").unwrap());
+        let d = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("3field").unwrap());
+        let e = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("4field").unwrap());
+        let p = Poseidon4::<FormalCircuit>::new(Mode::Private, native.clone());
+        let result = Poseidon4::hash(&p, &[a, b, c, d, e]);
+
+        // In order to complete the calculation in the circuit, try multiplying by a dummy field element
+        let dd = Field::<FormalCircuit>::new(Mode::Private, ConsoleField::from_str("5field").unwrap());
+        let _candidate = result * dd;
+
+        // print FormalCircuit to JSON in console
+        let transcript = FormalCircuit::clear();
+        let output = serde_json::to_string_pretty(&transcript).unwrap();
+        println!("// psd4 of 5 input fields, with dummy mul at end ({} constraints)", transcript.entries.len());
         println!("{}", output);
         Ok(())
     }
